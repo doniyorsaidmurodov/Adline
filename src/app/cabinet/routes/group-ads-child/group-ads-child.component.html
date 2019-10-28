@@ -1,0 +1,178 @@
+<app-navbar></app-navbar>
+
+<div class="sub-header">
+  <div class="container-fluid sub-nav p-0">
+    <div>Суммированная статистика</div>
+    <div class="right">
+      <div class="stat">
+        <span class="title">{{total.clicks|number}}</span>
+        <span class="body">Клики</span>
+      </div>
+      <div class="stat">
+        <span class="title">{{total.impressions|number}}</span>
+        <span class="body">показов</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrapper">
+  <div class="container-fluid">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a routerLink="/cabinet/home">Главная страница</a></li>
+        <li class="breadcrumb-item"><a routerLink="/cabinet/group-ads">Группы объявлений</a></li>
+        <li aria-current="page" class="breadcrumb-item active">{{id}}</li>
+      </ol>
+    </nav>
+
+    <!------Main------>
+    <div class="main p-3">
+      <div class="row">
+        <div class="col-12">
+          <div class="main-nav pt-0 pr-0">
+            <div>
+              <a class="btn btn-google active" href="javascript:void(0)"
+                 *ngIf="currentType === 'GOOGLE_ADWORDS'">
+                <span class="btn-label"><i class="fa fa-google"></i></span>Google Adwords
+              </a>
+              <a class="btn btn-youtube active" href="javascript:void(0)"
+                 *ngIf="currentType === 'YOUTUBE'">
+                <span class="btn-label"><i class="fa fa-youtube"></i></span>Youtube
+              </a>
+              <a class="btn btn-yandex active" href="javascript:void(0)"
+                 *ngIf="currentType === 'YANDEX_DIRECT'">
+                <span class="btn-label"><i class="fa fa-yahoo"></i></span>Yandex.Direct
+              </a>
+            </div>
+            <div>
+              <div class="btn-group mr-3" role="group">
+                <button type="button" class="btn btn-outline-primary"
+                        [class.active]="currentPeriod === 1" (click)="setPeriod(1)">Неделя
+                </button>
+                <button type="button" class="btn btn-outline-primary"
+                        [class.active]="currentPeriod === 2" (click)="setPeriod(2)">Месяц
+                </button>
+                <button type="button" class="btn btn-outline-primary"
+                        [class.active]="currentPeriod === 3" (click)="setPeriod(3)">Квартал
+                </button>
+                <button type="button" class="btn btn-outline-primary"
+                        [class.active]="currentPeriod === 4" (click)="setPeriod(4)">Год
+                </button>
+                <!--                <button type="button" class="btn btn-outline-primary"-->
+                <!--                        [class.active]="currentPeriod === 5" (click)="openModal(customDateForData)">-->
+                <!--                  <i class="fa fa-calendar"></i>-->
+                <!--                </button>-->
+              </div>
+              <button class="btn btn-success" disabled>
+                <i class="fa fa-upload mr-1"></i>Скачать данные
+              </button>
+            </div>
+          </div>
+
+          <div class="main-nav" style="border: none; height: 50px;">
+            <div class="sec-left"></div>
+            <div class="sec-right">
+              <span class="period-text">Период:</span>
+              <span class="text-muted">от {{currentDates.second|date:'dd.MM.yyyy'}}
+                до {{currentDates.current|date:'dd.MM.yyyy'}}</span>
+            </div>
+          </div>
+
+          <app-loader *ngIf="loading"></app-loader>
+
+          <table class="table table-bordered table-hover" *ngIf="!loading && adGroupList.length">
+
+            <thead>
+            <tr>
+              <th>ID группы</th>
+              <th>Название группы</th>
+              <th>Клики</th>
+              <th>Показы</th>
+              <th>Посмотреть</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr *ngFor="let adGroup of getPaginationList()">
+              <td>{{adGroup.id}}</td>
+              <td>{{adGroup.name}}</td>
+              <td><a href="#" title="">{{adGroup.clicks}}</a></td>
+              <td><a href="#" title="">{{adGroup.impressions}}</a></td>
+              <td><a href="#" class="btn hidden-sm-down btn-success"
+                     [routerLink]="['/cabinet/ads', adGroup.id]">
+                Просмотр объявлений
+              </a></td>
+            </tr>
+            </tbody>
+
+            <tfoot>
+            <tr>
+              <td colspan="5">
+                <nav>
+                  <ul class="pagination">
+                    <li class="page-item" [class.disabled]="currentPagination <= 1">
+                      <a class="page-link" href="javascript:void(0)" (click)="setPagination(currentPagination - 1)">Previous</a>
+                    </li>
+                    <li class="page-item active">
+                      <a class="page-link" href="javascript:void(0)" (click)=setPagination(currentPagination)>
+                        {{currentPagination}}
+                      </a>
+                    </li>
+                    <li class="page-item" [class.disabled]="currentPagination + 1 > (this.adGroupList.length / 10)+1">
+                      <a class="page-link" href="javascript:void(0)" (click)=setPagination(currentPagination+1)>
+                        {{currentPagination + 1}}
+                      </a>
+                    </li>
+                    <li class="page-item" [class.disabled]="currentPagination + 2 > (this.adGroupList.length / 10)+1">
+                      <a class="page-link" href="javascript:void(0)"
+                         (click)=setPagination(currentPagination+2)>
+                        {{currentPagination + 2}}
+                      </a>
+                    </li>
+                    <li class="page-item"
+                        [class.disabled]="currentPagination + 1 > (this.adGroupList.length / 10)+1">
+                      <a class="page-link" href="javascript:void(0)"
+                         (click)="setPagination(currentPagination + 1)">Next</a>
+                    </li>
+                  </ul>
+                </nav>
+              </td>
+            </tr>
+            </tfoot>
+
+          </table>
+          <div class="alert alert-danger" *ngIf="!loading && !adGroupList.length">
+            <h3>Ничего не найдено</h3>
+            <hr>
+            <h6>Нам очень жаль, но таблица пока пустая</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>
+
+<!--Modal-->
+<!--<ng-template #customDateForData>-->
+<!--  <div class="modal-header">-->
+<!--    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">-->
+<!--      <span aria-hidden="true">&times;</span>-->
+<!--    </button>-->
+<!--    <h4 class="modal-title pull-left">Период выбора</h4>-->
+<!--  </div>-->
+<!--  <div class="modal-body">-->
+<!--    <div class="form-group">-->
+<!--      <label for="_from">Дата начала</label>-->
+<!--      <input type="date" id="_from" class="form-control" [(ngModel)]="dates.first" [max]="dates.first">-->
+<!--      <label for="_to">Дата окончания</label>-->
+<!--      <input type="date" id="_to" class="form-control" [(ngModel)]="dates.second" [max]="dates.second">-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  <div class="modal-footer">-->
+<!--    <button type="button" class="btn btn-success" (click)="apply()" id="customDateSend">Применять</button>-->
+<!--    <button type="button" class="btn btn-default" (click)="modalRef.hide()">Закрыть</button>-->
+<!--  </div>-->
+<!--</ng-template>-->

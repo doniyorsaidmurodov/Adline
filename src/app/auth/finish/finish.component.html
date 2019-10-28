@@ -1,0 +1,19 @@
+<div class="login">
+  <div class="form">
+    <div class="title">Введите код</div>
+    <div *ngIf="error" class="alert alert-danger w-100">{{error}}</div>
+    <div class="form-group">
+      <label>
+        <input [(ngModel)]="code" class="form-control" placeholder="Код с почты" type="text">
+      </label>
+    </div>
+    <div class="form-group">
+      <label>
+        <input [(ngModel)]="newPassword" class="form-control" placeholder="Новый пароль" type="password">
+      </label>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit" (click)="send()">
+      Отправить
+    </button>
+  </div>
+</div>

@@ -1,0 +1,37 @@
+<!--<div>-->
+<!--  <div *ngIf="error" class="alert alert-danger">{{error}}</div>-->
+<!--  login: <label><input [(ngModel)]="login" type="text"></label> <br>-->
+<!--  password: <label><input  type="password"></label> <br>-->
+<!--  <button (click)="submit()">submit</button>-->
+<!--</div>-->
+<div class="login">
+  <div class="form">
+    <div class="title">Войти в систему</div>
+    <div *ngIf="error" class="alert alert-danger w-100">{{error}}</div>
+    <div class="form-group">
+      <label><input [(ngModel)]="login" class="form-control" placeholder="Email" type="text"></label>
+    </div>
+    <div class="form-group">
+      <label><input [(ngModel)]="password" class="form-control" placeholder="Password" type="password"></label>
+    </div>
+    <div class="form-group">
+      <div class="remember">
+        <a class="forgot" routerLink="reset/init"><img alt="img" src="../../assets/img/icons/lock.svg">Забыли пароль?</a>
+        <div class="d-flex flex-row-reverse align-items-center justify-content-center pr-3">
+          <label for="remember">Запомни меня</label>
+          <input id="remember" name="remember" type="checkbox"></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <div class="check-it">
+        <label for="condition">
+          <input (change)="agreeToConditions(!agree)" id="condition" name="condition" type="checkbox">
+          Я согласен с условиями <a href="javascript:void(0)">политики конфиденциальности</a>
+        </label>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit" (click)="submit()" [class.disabled]="!agree" [disabled]="loading">
+      ВОЙТИ
+    </button>
+  </div>
+</div>

@@ -1,0 +1,111 @@
+<header class="topbar">
+  <nav class="navbar top-navbar navbar-expand-lg navbar-light">
+    <!-- Logo -->
+    <div class="navbar-header">
+      <a class="navbar-brand" routerLink="/cabinet/home">
+        <img class="logo" src="../../../../assets/img/logo.png" alt="Inside logo">
+      </a>
+    </div>
+    <button class="navbar-toggler" type="button">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- End-Logo -->
+    <!-- Nav-Items -->
+    <div class="collapse navbar-collapse" id="collapsingNavbarMd">
+      <ul class="navbar-nav mr-auto mt-md-0">
+        <li class="nav-item">
+          <a class="nav-link nav-text" routerLink="/cabinet/platforms">Платформы</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-text" routerLink="/cabinet/campaigns">Мои рекламные кампании</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-text" routerLink="/cabinet/group-ads">Группы объявлений</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link nav-text" routerLink="/cabinet/ads">Объявления</a>
+        </li>
+      </ul>
+
+
+      <!-- User-Profile -->
+      <ul class="navbar-nav my-lg-0">
+        <li class="nav-item" dropdown>
+          <div class="nav-link waves-effect" id="button-user" dropdownToggle aria-controls="dropdown-user">
+            <img src="../../../../assets/img/default-user.png" alt="user" class="user-picture">
+          </div>
+          <div id="dropdown-user" class="dropdown-menu dropdown-menu-right animated flipInY" *dropdownMenu
+               role="menu" aria-labelledby="button-user">
+            <div role="menuitem">
+              <ul class="dropdown-user">
+                <li class="u-items">
+                  <div class="user-box">
+                    <div class="u-img"><img src="../../../../assets/img/default-user.png" alt="user"></div>
+                    <div class="u-text" *ngIf="user">
+                      <h4 class="u-name">{{user.name}}</h4>
+                      <p class="u-mail">{{user.email}}</p>
+                      <a href="javascript:void(0)" class="btn btn-danger btn-rounded"
+                         *ngFor="let role of user.authorities">{{role === 'ROLE_USER' ? 'Client' : role}}</a>
+                    </div>
+                  </div>
+                </li>
+                <li class="u-setts">
+                  <div class="u-settings" (click)="openModal(uSettings)">
+                    <i class="fa fa-cog"></i> Изменить пароль
+                  </div>
+                </li>
+                <!--                              <hr class="divider">-->
+                <li class="u-setts">
+                  <div class="u-settings" (click)="logOut()">
+                    <i class="fa fa-power-off"></i> Выход
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </li>
+
+        <!-- End-User-Profile -->
+
+        <li class="nav-item" dropdown>
+          <div class="nav-link text-muted waves-effect" id="ru" dropdownToggle aria-controls="dropdown-ru">RU</div>
+          <div class="dropdown-menu  dropdown-menu-right animated fadeInDown" id="dropdown-ru"
+               aria-labelledby="button-user" style="min-width: 0;" *dropdownMenu>
+            <a class="dropdown-item" href="#">EN</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<!-- Modal -->
+<ng-template #uSettings>
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 class="modal-title pull-left">Изменить пароль</h4>
+  </div>
+  <div class="modal-body">
+    <div class="text-danger text-center">{{error}}</div>
+    <div class="form-group row">
+      <label for="old_password" class="col-4 mt-2">Прежний пароль</label>
+      <input type="password" id="old_password" class="form-control col-7" name="old_password" [(ngModel)]="oldPassword">
+    </div>
+    <div class="form-group row">
+      <label for="new_password" class="col-4 mt-2">Новый пароль</label>
+      <input type="password" id="new_password" class="form-control col-7" name="new_password" [(ngModel)]="newPassword">
+    </div>
+    <div class="form-group row">
+      <label for="new_password_retype" class="col-4">Введите новый пароль</label>
+      <input type="password" id="new_password_retype" class="form-control col-7" name="new_password_retype"
+             [(ngModel)]="confirmNewPassword">
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-info" id="customDateSend" (click)="changePassword()">Обновить</button>
+    <button type="button" class="btn btn-danger" (click)="closeModal()">Отмена</button>
+  </div>
+</ng-template>
+<!-- End-Modal -->

@@ -1,0 +1,108 @@
+<app-navbar></app-navbar>
+
+<!--------Main-------->
+<div class="wrapper">
+  <div class="container-fluid">
+    <div class="main">
+      <div class="main-header">
+        <h1>Main</h1>
+      </div>
+      <div class="main-nav">
+        <div class="sec-left">
+          <ng-container *ngFor="let each of filtered" >
+            <input type="checkbox" name="playform{{each.name}}" id="playform{{each.name}}"
+                   [(ngModel)]="each.value" (click)="filter(each.name)">
+            <label for="playform{{each.name}}"> {{each.name}}</label>
+          </ng-container>
+        </div>
+        <div>
+          <div class="btn-group mr-3" role="group">
+            <button type="button" class="btn btn-outline-primary"
+                    [class.active]="currentPeriod === 1" (click)="setPeriod(1)">Неделя
+            </button>
+            <button type="button" class="btn btn-outline-primary"
+                    [class.active]="currentPeriod === 2" (click)="setPeriod(2)">Месяц
+            </button>
+            <button type="button" class="btn btn-outline-primary"
+                    [class.active]="currentPeriod === 3" (click)="setPeriod(3)">Квартал
+            </button>
+            <button type="button" class="btn btn-outline-primary"
+                    [class.active]="currentPeriod === 4" (click)="setPeriod(4)">Год
+            </button>
+            <!--            <button type="button" class="btn btn-outline-primary" (click)="openModal(customDateForData)">-->
+            <!--              <i class="fa fa-calendar"></i>-->
+            <!--            </button>-->
+          </div>
+          <button class="btn btn-success" disabled>
+            <i class="fa fa-upload mr-1"></i>Скачать данные
+          </button>
+        </div>
+      </div>
+      <div class="main-nav border-0" style="height: 50px;">
+        <div></div>
+        <div>
+          <span class="period-text">Период:</span>
+          <span class="text-muted">от {{currentDates.second|date:'dd.MM.yyyy'}}
+            до {{currentDates.current|date:'dd.MM.yyyy'}}</span>
+        </div>
+      </div>
+      <section class="main-section p-3">
+        <div class="row">
+          <!-- Table -->
+          <div class="col-6">
+            <table class="table table-bordered table-hover toggle-circle">
+              <thead>
+              <tr>
+                <th>Платформы</th>
+                <th>Клики</th>
+                <th>Показы</th>
+                <th>СТР%</th>
+              </tr>
+              </thead>
+              <tbody id="PTable">
+              <tr *ngFor="let data of chartData">
+                <td style="text-align: left">{{data.id}}</td>
+                <td>{{data.clicks}}</td>
+                <td>{{data.impressions}}</td>
+                <td>{{data.clickRate}}%</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Chart -->
+          <div class="col-6">
+            <div echarts [options]="chartOption" class="demo-chart"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+<!--------End-Main-------->
+
+<app-footer></app-footer>
+
+<!-- Modal -->
+<!--<ng-template #customDateForData>-->
+<!--  <div class="modal-header">-->
+<!--    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">-->
+<!--      <span aria-hidden="true">&times;</span>-->
+<!--    </button>-->
+<!--    <h4 class="modal-title pull-left">Период выбора</h4>-->
+<!--  </div>-->
+<!--  <div class="modal-body">-->
+<!--    <div class="form-group">-->
+<!--      <label for="_from">Дата начала</label>-->
+<!--      <input type="date" id="_from" class="form-control" max="2019-10-14">-->
+<!--      <label for="_to">Дата окончания</label>-->
+<!--      <input type="date" id="_to" class="form-control" min="2019-10-14">-->
+<!--    </div>-->
+<!--  </div>-->
+<!--  <div class="modal-footer">-->
+<!--    <button type="button" class="btn btn-success" id="customDateSend"-->
+<!--            onclick="getCustomData()">Применять-->
+<!--    </button>-->
+<!--    <button type="button" class="btn btn-default" (click)="modalRef.hide()">Закрыть</button>-->
+<!--  </div>-->
+<!--</ng-template>-->
+<!-- End-Modal -->

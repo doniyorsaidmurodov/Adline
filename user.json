@@ -1,0 +1,90 @@
+[
+  {
+    "id": "750561552",
+    "name": "Youtube",
+    "status": "enabled",
+    "clicks": 75,
+    "impressions": 6414,
+    "clickRate": 1.1693
+  },
+  {
+    "id": "1380101171",
+    "name": "Роуминг 01.05.2018",
+    "status": "paused",
+    "clicks": 11,
+    "impressions": 30,
+    "clickRate": 36.6667
+  },
+  {
+    "id": "1466141427",
+    "name": "IMO_05.07.18",
+    "status": "paused",
+    "clicks": 326,
+    "impressions": 14532,
+    "clickRate": 2.2433
+  },
+  {
+    "id": "1588644173",
+    "name": "GooglePlay_ads",
+    "status": "paused",
+    "clicks": 304,
+    "impressions": 11046,
+    "clickRate": 2.7521
+  },
+  {
+    "id": "1694530682",
+    "name": "тест",
+    "status": "paused",
+    "clicks": 485,
+    "impressions": 10836,
+    "clickRate": 4.4758
+  },
+  {
+    "id": "1816582237",
+    "name": "Imo",
+    "status": "enabled",
+    "clicks": 24856,
+    "impressions": 704726,
+    "clickRate": 3.527
+  },
+  {
+    "id": "1820291414",
+    "name": "APPStore",
+    "status": "enabled",
+    "clicks": 44484,
+    "impressions": 1939620,
+    "clickRate": 2.2934
+  },
+  {
+    "id": "1820391994",
+    "name": "Search 25.05.19",
+    "status": "paused",
+    "clicks": 14386,
+    "impressions": 35920,
+    "clickRate": 40.0501
+  },
+  {
+    "id": "1820832168",
+    "name": "GPlay",
+    "status": "enabled",
+    "clicks": 32320,
+    "impressions": 1244619,
+    "clickRate": 2.5968
+  },
+  {
+    "id": "2031543103",
+    "name": "Beeline Search",
+    "status": "paused",
+    "clicks": 10630,
+    "impressions": 359050,
+    "clickRate": 2.9606
+  },
+  {
+    "id": "2070591598",
+    "name": "Search Beeline Gigi",
+    "status": "paused",
+    "clicks": 8942,
+    "impressions": 46305,
+    "clickRate": 19.3111
+  }
+]

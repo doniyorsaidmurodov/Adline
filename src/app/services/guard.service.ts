@@ -16,6 +16,11 @@ export class GuardService implements CanActivate {
     if (token) {
       return true;
     } else {
+      const tokenCookie = this.authService.getTokenFromCookie();
+      if (tokenCookie) {
+        this.authService.setToken(tokenCookie);
+        return true;
+      }
       this.router.navigate(['/auth'], {queryParams: {next: state.url}}).then();
       return false;
     }

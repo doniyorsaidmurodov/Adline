@@ -1,38 +1,35 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {ApiService} from '../../../services/api.service';
 import {Platform} from '../../../models/Platform';
+import {ModalComponent} from '../../components/modal/modal.component';
 
 @Component({
   selector: 'app-platforms',
   templateUrl: './platforms.component.html',
 })
 export class PlatformsComponent implements OnInit, OnDestroy {
-  // modalRef: BsModalRef;
+  @ViewChild('modalComponent', {static: false}) modalComponent: ModalComponent;
+  bsInlineRangeValue: Date[] = [];
 
   adList: Platform[] = [];
   loading = false;
   error: string = null;
   requestSub: Subscription;
+  // requestParams: string = null;
 
   total = {
     clicks: 0,
     impressions: 0
   };
-  currentPagination = 1;
   currentPeriod = 4;
   currentDates: {
     current: Date;
     second: Date;
   };
 
-  // private modalService: BsModalService,
   constructor(private apiService: ApiService) {
   }
-
-  // openModal(modalName: TemplateRef<any>) {
-  //   this.modalRef = this.modalService.show(modalName);
-  // }
 
   ngOnInit() {
     this.getTable();
@@ -44,39 +41,11 @@ export class PlatformsComponent implements OnInit, OnDestroy {
     }
   }
 
-  setPagination(page: number): void {
-    if (page <= 0 || page > Math.ceil(this.adList.length / 10)) {
-      return;
-    }
-    this.currentPagination = page;
-  }
-
-  getPaginationList(): Platform[] {
-    /*
-    1 -> 1*10 = 0 9
-    2 -> 2*10 = 10 19
-     */
-    return this.adList.filter((e, index) => index >= this.currentPagination * 10 - 10 && index < this.currentPagination * 10);
-  }
-
   private getTable() {
     let secondDate = null;
-    const currentDate = new Date();
-    const currentYearStart = new Date(currentDate.getFullYear(), 0, 2);
+    let currentDate = new Date();
     this.loading = true;
-    this.currentPagination = 1;
     this.adList = [];
-
-    this.apiService.getPlatformList(currentYearStart.toISOString(), currentDate.toISOString())
-      .subscribe(next => {
-        this.loading = false;
-        console.log(next);
-
-        next.forEach(each => {
-          const obj: Platform = new Platform(each);
-          this.adList.push(obj);
-        });
-      }, error => console.error(error));
 
     switch (this.currentPeriod) {
       case 1:
@@ -96,6 +65,10 @@ export class PlatformsComponent implements OnInit, OnDestroy {
       case 4:
         secondDate = new Date(currentDate.getFullYear(), 0, 1);
         break;
+      case 5:
+        currentDate = new Date(this.bsInlineRangeValue[1]);
+        secondDate = new Date(this.bsInlineRangeValue[0]);
+        break;
       default:
         secondDate = new Date(currentDate.getFullYear(), 0, 1);
         this.currentPeriod = 4;
@@ -109,8 +82,17 @@ export class PlatformsComponent implements OnInit, OnDestroy {
       clicks: 0,
       impressions: 0
     };
-    // this.loading = true;
-    // this.adList = [];
+
+    // this.requestParams = JSON.stringify({fromDate: secondDate.toISOString(), toDate: currentDate.toISOString()});
+    this.apiService.getPlatformList(secondDate.toISOString(), currentDate.toISOString())
+      .subscribe(next => {
+        this.loading = false;
+
+        next.forEach(each => {
+          const obj: Platform = new Platform(each);
+          this.adList.push(obj);
+        });
+      }, error => console.error(error));
   }
 
   setPeriod(number1: number) {
@@ -120,6 +102,22 @@ export class PlatformsComponent implements OnInit, OnDestroy {
     this.currentPeriod = number1;
     this.getTable();
   }
+
+  apply(event) {
+    this.bsInlineRangeValue = event;
+    this.currentPeriod = 5;
+    this.getTable();
+  }
+
+  openModal() {
+    this.modalComponent.openModal();
+  }
+
+  // download() {
+  //   sessionStorage.setItem('download', this.requestParams);
+  //   sessionStorage.setItem('downloadRoute', 'platforms');
+  //   window.open(window.origin + '/cabinet/download', '_blank');
+  // }
 }
 
 function dateBack(days: number) {

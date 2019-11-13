@@ -59,12 +59,12 @@
                 <button type="button" class="btn btn-outline-primary"
                         [class.active]="currentPeriod === 4" (click)="setPeriod(4)">Год
                 </button>
-                <!--                <button type="button" class="btn btn-outline-primary"-->
-                <!--                        [class.active]="currentPeriod === 5" (click)="openModal(customDateForData)">-->
-                <!--                  <i class="fa fa-calendar"></i>-->
-                <!--                </button>-->
+                <button type="button" class="btn btn-outline-primary" [class.active]="currentPeriod === 5"
+                        (click)="openModal()">
+                  <i class="fa fa-calendar"></i>
+                </button>
               </div>
-              <button class="btn btn-success" disabled>
+              <button class="btn btn-success" (click)="download()">
                 <i class="fa fa-upload mr-1"></i>Скачать данные
               </button>
             </div>
@@ -89,16 +89,18 @@
               <th>Название группы</th>
               <th>Клики</th>
               <th>Показы</th>
+              <th>CTR%</th>
               <th>Посмотреть</th>
             </tr>
             </thead>
 
             <tbody>
-            <tr *ngFor="let adGroup of getPaginationList()">
+            <tr *ngFor="let adGroup of adGroupListShowed">
               <td>{{adGroup.id}}</td>
               <td>{{adGroup.name}}</td>
               <td><a href="#" title="">{{adGroup.clicks}}</a></td>
               <td><a href="#" title="">{{adGroup.impressions}}</a></td>
+              <td><a href="#" title="">{{adGroup.clickRate}}</a></td>
               <td><a href="#" class="btn hidden-sm-down btn-success"
                      [routerLink]="['/cabinet/ads', adGroup.id]">
                 Просмотр объявлений
@@ -108,35 +110,9 @@
 
             <tfoot>
             <tr>
-              <td colspan="5">
-                <nav>
-                  <ul class="pagination">
-                    <li class="page-item" [class.disabled]="currentPagination <= 1">
-                      <a class="page-link" href="javascript:void(0)" (click)="setPagination(currentPagination - 1)">Previous</a>
-                    </li>
-                    <li class="page-item active">
-                      <a class="page-link" href="javascript:void(0)" (click)=setPagination(currentPagination)>
-                        {{currentPagination}}
-                      </a>
-                    </li>
-                    <li class="page-item" [class.disabled]="currentPagination + 1 > (this.adGroupList.length / 10)+1">
-                      <a class="page-link" href="javascript:void(0)" (click)=setPagination(currentPagination+1)>
-                        {{currentPagination + 1}}
-                      </a>
-                    </li>
-                    <li class="page-item" [class.disabled]="currentPagination + 2 > (this.adGroupList.length / 10)+1">
-                      <a class="page-link" href="javascript:void(0)"
-                         (click)=setPagination(currentPagination+2)>
-                        {{currentPagination + 2}}
-                      </a>
-                    </li>
-                    <li class="page-item"
-                        [class.disabled]="currentPagination + 1 > (this.adGroupList.length / 10)+1">
-                      <a class="page-link" href="javascript:void(0)"
-                         (click)="setPagination(currentPagination + 1)">Next</a>
-                    </li>
-                  </ul>
-                </nav>
+              <td colspan="7">
+                <pagination [hidden]="adGroupList.length <= 15" [itemsPerPage]="15" [totalItems]="adGroupList.length"
+                            (pageChanged)="pageChanged($event)"></pagination>
               </td>
             </tr>
             </tfoot>
@@ -155,24 +131,4 @@
 
 <app-footer></app-footer>
 
-<!--Modal-->
-<!--<ng-template #customDateForData>-->
-<!--  <div class="modal-header">-->
-<!--    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">-->
-<!--      <span aria-hidden="true">&times;</span>-->
-<!--    </button>-->
-<!--    <h4 class="modal-title pull-left">Период выбора</h4>-->
-<!--  </div>-->
-<!--  <div class="modal-body">-->
-<!--    <div class="form-group">-->
-<!--      <label for="_from">Дата начала</label>-->
-<!--      <input type="date" id="_from" class="form-control" [(ngModel)]="dates.first" [max]="dates.first">-->
-<!--      <label for="_to">Дата окончания</label>-->
-<!--      <input type="date" id="_to" class="form-control" [(ngModel)]="dates.second" [max]="dates.second">-->
-<!--    </div>-->
-<!--  </div>-->
-<!--  <div class="modal-footer">-->
-<!--    <button type="button" class="btn btn-success" (click)="apply()" id="customDateSend">Применять</button>-->
-<!--    <button type="button" class="btn btn-default" (click)="modalRef.hide()">Закрыть</button>-->
-<!--  </div>-->
-<!--</ng-template>-->
+<app-modal (apply)="apply($event)" #modalComponent></app-modal>

@@ -1,47 +1,55 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {ApiService} from '../../../services/api.service';
 import EChartOption = echarts.EChartOption;
 import {Campaign} from '../../../models/Campaign';
+import {ModalComponent} from '../../components/modal/modal.component';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
 })
-export class MainComponent implements OnInit {
-  // modalRef: BsModalRef;
+export class MainComponent implements OnInit, OnDestroy {
+  @ViewChild('modalComponent', {static: false}) modalComponent: ModalComponent;
+  bsInlineRangeValue: Date[] = [];
+
   title = 'adline';
   colors = ['#d14a61', '#5793f3', '#69AD71'];
   chartOption: EChartOption;
-
   chartData: Campaign[] = [];
   currentPeriod = 4;
   currentDates: {
     current: Date;
     second: Date;
   };
+  loading = false;
+  requestSub: Subscription;
+  // requestParams: string = null;
 
   filtered = [
-    {name: 'All', value: true},
-    {name: 'Google', value: false},
-    {name: 'Youtube', value: false},
-    {name: 'Yandex', value: false}
+    {name: 'All', type: 'ALL', value: true},
+    {name: 'Google', type: 'GOOGLE_ADWORDS', value: false},
+    {name: 'Youtube', type: 'YOUTUBE', value: false},
+    {name: 'Yandex', type: 'YANDEX_DIRECT', value: false},
+    {name: 'Facebook', type: 'FACEBOOK', value: false},
   ];
 
-  // private modalService: BsModalService
   constructor(private apiService: ApiService) {
   }
-
-  // openModal(modalName: TemplateRef<any>) {
-  //   this.modalRef = this.modalService.show(modalName);
-  // }
 
   ngOnInit(): void {
     this.request();
   }
 
+  ngOnDestroy(): void {
+    if (this.requestSub) {
+      this.requestSub.unsubscribe();
+    }
+  }
+
   request(type: string = 'ALL'): void {
     let secondDate = null;
-    const currentDate = new Date();
+    let currentDate = new Date();
 
     switch (this.currentPeriod) {
       case 1:
@@ -61,6 +69,10 @@ export class MainComponent implements OnInit {
       case 4:
         secondDate = new Date(currentDate.getFullYear(), 0, 1);
         break;
+      case 5:
+        currentDate = new Date(this.bsInlineRangeValue[1]);
+        secondDate = new Date(this.bsInlineRangeValue[0]);
+        break;
       default:
         secondDate = new Date(currentDate.getFullYear(), 0, 1);
         this.currentPeriod = 4;
@@ -70,11 +82,18 @@ export class MainComponent implements OnInit {
       second: secondDate
     };
 
+    this.loading = true;
     this.chartData = [];
 
-    this.apiService.getChartData(type, secondDate.toISOString(), currentDate.toISOString())
+    if (this.requestSub) {
+      this.requestSub.unsubscribe();
+    }
+
+    // this.requestParams = JSON.stringify({type, fromDate: secondDate.toISOString(), toDate: currentDate.toISOString()});
+    this.requestSub = this.apiService.getChartData(type, secondDate.toISOString(), currentDate.toISOString())
       .subscribe(next => {
-        console.log(next);
+        this.loading = false;
+
         const labels = [];
         const clicks = [];
         const impr = [];
@@ -89,8 +108,6 @@ export class MainComponent implements OnInit {
           const obj: Campaign = new Campaign(data);
           this.chartData.push(obj);
         });
-
-        console.log(this.chartData);
 
         this.chartOption = {
           color: this.colors,
@@ -180,24 +197,28 @@ export class MainComponent implements OnInit {
             }
           ]
         };
-      }, error => console.error(error));
+      }, error => {
+        this.loading = false;
+
+        console.error(error);
+      });
   }
 
   filter(com: string = null) {
     if (com !== null) {
-      if (com.toUpperCase() === 'ALL') {
+      if (com === 'All') {
         this.filtered.forEach(each => each.value = false);
         this.filtered[0].value = true;
       } else {
         this.filtered[0].value = false;
-        this.filtered.filter(each => each.name.toUpperCase() === com.toUpperCase())[0].value = true;
+        this.filtered.filter(each => each.name === com)[0].value = true;
       }
     }
     setTimeout(() => {
       if (!this.filtered.filter(each => each.value).length) {
         this.filtered[0].value = true;
       }
-      const type = this.filtered.filter(each => each.value).map(each => each.name.toUpperCase()).join(',');
+      const type = this.filtered.filter(each => each.value).map(each => each.type).join(',');
       this.request(type);
     }, 200);
   }
@@ -209,6 +230,22 @@ export class MainComponent implements OnInit {
     this.currentPeriod = number1;
     this.filter();
   }
+
+  apply(event) {
+    this.bsInlineRangeValue = event;
+    this.currentPeriod = 5;
+    this.filter();
+  }
+
+  openModal() {
+    this.modalComponent.openModal();
+  }
+
+  // download() {
+  //   sessionStorage.setItem('download', this.requestParams);
+  //   sessionStorage.setItem('downloadRoute', 'dashboard');
+  //   window.open(window.origin + '/cabinet/download', '_blank');
+  // }
 }
 
 function dateBack(days: number) {

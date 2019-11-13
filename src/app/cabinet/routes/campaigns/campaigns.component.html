@@ -14,7 +14,7 @@
       </div>
       <!--      <div class="stat">-->
       <!--        <span class="title">3.3597 %</span>-->
-      <!--        <span class="body">СТР %</span>-->
+      <!--        <span class="body">CTR %</span>-->
       <!--      </div>-->
     </div>
   </div>
@@ -54,6 +54,12 @@
                 <span class="btn-label"><i class="fa fa-yahoo"></i></span>Yandex.Direct
               </a>
             </li>
+            <li class="nav-item" style="margin-bottom: 5px">
+              <a class="btn btn-block btn-facebook" href="javascript:void(0)"
+                 [class.active]="currentType === 'FACEBOOK'" (click)="changeTabStatus('FACEBOOK')">
+                <span class="btn-label"><i class="fa fa-facebook"></i></span>Facebook
+              </a>
+            </li>
           </ul>
         </div>
         <div class="col-md-10">
@@ -74,12 +80,13 @@
                   <button type="button" class="btn btn-outline-primary"
                           [class.active]="currentPeriod === 4" (click)="setPeriod(4)">Год
                   </button>
-                  <!--                  <button type="button" class="btn btn-outline-primary" (click)="openModal(customDateForData)">-->
-                  <!--                    <i class="fa fa-calendar"></i>-->
-                  <!--                  </button>-->
+                  <button type="button" class="btn btn-outline-primary" [class.active]="currentPeriod === 5"
+                          (click)="openModal()">
+                    <i class="fa fa-calendar"></i>
+                  </button>
                 </div>
-                <button class="btn btn-success" disabled>
-                  <i class="fa fa-upload mr-1"></i>Скачать данные
+                <button class="btn btn-success" (click)="download()">
+                  <i class="fa fa-upload mr-1"></i> Скачать данные
                 </button>
               </div>
             </div>
@@ -95,7 +102,7 @@
 
             <app-loader *ngIf="loading"></app-loader>
 
-            <table class="table table-bordered table-hover" *ngIf="!loading && campaignList.length">
+            <table class="table table-bordered table-hover" *ngIf="!loading && campaignListShowed.length">
               <thead>
               <tr>
                 <th>ID Кампании</th>
@@ -103,13 +110,13 @@
                 <th>Статус</th>
                 <th>Клики</th>
                 <th>Показы</th>
-                <th>СТР%</th>
+                <th>CTR%</th>
                 <th>Посмотреть</th>
               </tr>
               </thead>
 
               <tbody>
-              <tr *ngFor="let adCampaign of getPaginationList()">
+              <tr *ngFor="let adCampaign of campaignListShowed">
                 <td>{{adCampaign.id}}</td>
                 <td>{{adCampaign.name}}</td>
                 <td *ngIf="adCampaign.status"><span class="status green"></span>Запущено</td>
@@ -118,7 +125,8 @@
                 <td><a href="#" title="">{{adCampaign.impressions}}</a></td>
                 <td>{{adCampaign.clickRate}}%</td>
                 <td>
-                  <a class="btn hidden-sm-down btn-success" [routerLink]="['/cabinet/group-ads', adCampaign.id]">См. Группу</a>
+                  <a class="btn hidden-sm-down btn-success" href="javascript:void(0);"
+                     (click)="more(adCampaign.id)">См. Группу</a>
                 </td>
               </tr>
               </tbody>
@@ -126,44 +134,15 @@
               <tfoot>
               <tr>
                 <td colspan="7">
-                  <div class="text-right">
-                    <nav>
-                      <ul class="pagination">
-                        <li class="page-item" [class.disabled]="currentPagination <= 1">
-                          <a class="page-link" href="javascript:void(0)" (click)="setPagination(currentPagination - 1)">Previous</a>
-                        </li>
-                        <li class="page-item active">
-                          <a class="page-link" href="javascript:void(0)" (click)=setPagination(currentPagination)>
-                            {{currentPagination}}
-                          </a>
-                        </li>
-                        <li class="page-item"
-                            [class.disabled]="currentPagination + 1 > (this.campaignList.length / 10)+1">
-                          <a class="page-link" href="javascript:void(0)" (click)=setPagination(currentPagination+1)>
-                            {{currentPagination + 1}}
-                          </a>
-                        </li>
-                        <li class="page-item"
-                            [class.disabled]="currentPagination + 2 > (this.campaignList.length / 10)+1">
-                          <a class="page-link" href="javascript:void(0)"
-                             (click)=setPagination(currentPagination+2)>
-                            {{currentPagination + 2}}
-                          </a>
-                        </li>
-                        <li class="page-item"
-                            [class.disabled]="currentPagination + 1 > (this.campaignList.length / 10)+1">
-                          <a class="page-link" href="javascript:void(0)"
-                             (click)="setPagination(currentPagination + 1)">Next</a>
-                        </li>
-                      </ul>
-                    </nav>
-                  </div>
+                  <pagination [hidden]="campaignList.length <= 15" [itemsPerPage]="15"
+                              [totalItems]="campaignList.length"
+                              (pageChanged)="pageChanged($event)"></pagination>
                 </td>
               </tr>
               </tfoot>
 
             </table>
-            <div class="alert alert-danger" *ngIf="!loading && !campaignList.length">
+            <div class="alert alert-danger" *ngIf="!loading && !campaignListShowed.length">
               <h3>Ничего не найдено</h3>
               <hr>
               <h6>Нам очень жаль, но таблица пока пустая</h6>
@@ -177,25 +156,4 @@
 
 <app-footer></app-footer>
 
-<!-- Modal -->
-<!--<ng-template #customDateForData>-->
-<!--  <div class="modal-header">-->
-<!--    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">-->
-<!--      <span aria-hidden="true">&times;</span>-->
-<!--    </button>-->
-<!--    <h4 class="modal-title pull-left">Период выбора</h4>-->
-<!--  </div>-->
-<!--  <div class="modal-body">-->
-<!--    <div class="form-group">-->
-<!--      <label for="_from">Дата начала</label>-->
-<!--      <input type="date" id="_from" class="form-control" max="2019-10-14">-->
-<!--      <label for="_to">Дата окончания</label>-->
-<!--      <input type="date" id="_to" class="form-control" min="2019-10-14">-->
-<!--    </div>-->
-<!--  </div>-->
-<!--  <div class="modal-footer">-->
-<!--    <button type="button" class="btn btn-success" id="customDateSend">Применять</button>-->
-<!--    <button type="button" class="btn btn-default" (click)="modalRef.hide()">Закрыть</button>-->
-<!--  </div>-->
-<!--</ng-template>-->
-<!-- End-Modal -->
+<app-modal (apply)="apply($event)" #modalComponent></app-modal>

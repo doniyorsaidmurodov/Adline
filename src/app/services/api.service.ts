@@ -12,8 +12,8 @@ export class ApiService {
   }
 
   // user
-  login(username: string, password: string) {
-    return this.http.post<any>(host + 'authenticate', {username, password, rememberMe: false});
+  login(username: string, password: string, rememberMe: boolean = false) {
+    return this.http.post<any>(host + 'authenticate', {username, password, rememberMe});
   }
 
   getAccount() {
@@ -44,7 +44,6 @@ export class ApiService {
     return this.http.post(host + '/account/reset-password/finish', {key, newPassword});
   }
 
-
   // platform
   getAdGroupList(type: string, startDate: string, endDate: string, campaignId: number = null) {
     const token = this.authService.getToken();
@@ -73,7 +72,8 @@ export class ApiService {
     return this.http.post<any>(host + 'ads', body, {
       headers: {
         'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + token
+        Accept: 'application/octet-stream',
+        Authorization: 'Bearer ' + token,
       }
     });
   }
@@ -106,6 +106,17 @@ export class ApiService {
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token
+      }
+    });
+  }
+
+  getDownload(route: string, requests: string) {
+    const token = this.authService.getToken();
+    return this.http.post<any>(host + route + '/download', JSON.parse(requests), {
+      responseType: 'blob' as 'json',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
       }
     });
   }

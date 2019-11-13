@@ -1,0 +1,42 @@
+[
+  {
+    "id": "63362631069",
+    "name": "Online_toy_18.12.18",
+    "campaignId": "750561552",
+    "clicks": 2,
+    "impressions": 371,
+    "clickRate": 0.5391
+  },
+  {
+    "id": "71205329642",
+    "name": "CVM Youtube 26.04",
+    "campaignId": "750561552",
+    "clicks": 0,
+    "impressions": 207,
+    "clickRate": 0.0
+  },
+  {
+    "id": "73254502721",
+    "name": "MiFi 26.04",
+    "campaignId": "750561552",
+    "clicks": 20,
+    "impressions": 1374,
+    "clickRate": 1.4556
+  },
+  {
+    "id": "74840456634",
+    "name": "Beeline TV",
+    "campaignId": "750561552",
+    "clicks": 16,
+    "impressions": 1304,
+    "clickRate": 1.227
+  },
+  {
+    "id": "79567213914",
+    "name": "Gigi",
+    "campaignId": "750561552",
+    "clicks": 37,
+    "impressions": 3170,
+    "clickRate": 1.1672
+  }
+]

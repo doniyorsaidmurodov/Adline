@@ -26,11 +26,12 @@
             <button type="button" class="btn btn-outline-primary"
                     [class.active]="currentPeriod === 4" (click)="setPeriod(4)">Год
             </button>
-            <!--            <button (click)="openModal(customDateForData)" class="btn btn-outline-primary" type="button">-->
-            <!--              <i class="fa fa-calendar"></i>-->
-            <!--            </button>-->
+            <button class="btn btn-outline-primary" type="button" [class.active]="currentPeriod === 5"
+                    (click)="openModal()">
+              <i class="fa fa-calendar"></i>
+            </button>
           </div>
-          <button class="btn btn-success" disabled>
+          <button class="btn btn-success" (click)="download()">
             <i class="fa fa-upload mr-1"></i>Скачать данные
           </button>
         </div>
@@ -51,17 +52,19 @@
             <table class="table table-bordered table-hover toggle-circle" *ngIf="!loading && adList.length">
               <thead>
               <tr>
-                <th>Рекламные кампании</th>
-                <th>Группы объявлений</th>
+                <th>ID</th>
+                <th>Название группы</th>
+                <th>Название компаний</th>
                 <th>Клики</th>
                 <th>Показы</th>
-                <th>СТР%</th>
+                <th>CTR%</th>
               </tr>
               </thead>
               <tbody id="PTable">
-              <tr *ngFor="let list of getPaginationList()">
-                <td>{{list.campaignName}}</td>
+              <tr *ngFor="let list of adListShowed">
+                <td>{{list.id}}</td>
                 <td>{{list.groupName}}</td>
+                <td>{{list.campaignName}}</td>
                 <td>{{list.clicks}}</td>
                 <td>{{list.impressions}}</td>
                 <td>{{list.clickRate}}%</td>
@@ -69,35 +72,10 @@
               </tbody>
               <tfoot>
               <tr>
-                <td colspan="5" class="text-right">
-                  <nav>
-                    <ul class="pagination">
-                      <li class="page-item" [class.disabled]="currentPagination <= 1">
-                        <a class="page-link" href="javascript:void(0)" (click)="setPagination(currentPagination - 1)">Previous</a>
-                      </li>
-                      <li class="page-item active">
-                        <a class="page-link" href="javascript:void(0)" (click)=setPagination(currentPagination)>
-                          {{currentPagination}}
-                        </a>
-                      </li>
-                      <li class="page-item" [class.disabled]="currentPagination + 1 > (this.adList.length / 10)+1">
-                        <a class="page-link" href="javascript:void(0)" (click)=setPagination(currentPagination+1)>
-                          {{currentPagination + 1}}
-                        </a>
-                      </li>
-                      <li class="page-item" [class.disabled]="currentPagination + 2 > (this.adList.length / 10)+1">
-                        <a class="page-link" href="javascript:void(0)"
-                           (click)=setPagination(currentPagination+2)>
-                          {{currentPagination + 2}}
-                        </a>
-                      </li>
-                      <li class="page-item"
-                          [class.disabled]="currentPagination + 1 > (this.adList.length / 10)+1">
-                        <a class="page-link" href="javascript:void(0)"
-                           (click)="setPagination(currentPagination + 1)">Next</a>
-                      </li>
-                    </ul>
-                  </nav>
+                <td colspan="7">
+                  <pagination [hidden]="adList.length <= 15" [itemsPerPage]="15"
+                              [totalItems]="adList.length"
+                              (pageChanged)="pageChanged($event)"></pagination>
                 </td>
               </tr>
               </tfoot>
@@ -116,25 +94,4 @@
 
 <app-footer></app-footer>
 
-<!-- Modal -->
-<!--<ng-template #customDateForData>-->
-<!--  <div class="modal-header">-->
-<!--    <button (click)="modalRef.hide()" aria-label="Close" class="close pull-right" type="button">-->
-<!--      <span aria-hidden="true">&times;</span>-->
-<!--    </button>-->
-<!--    <h4 class="modal-title pull-left">Период выбора</h4>-->
-<!--  </div>-->
-<!--  <div class="modal-body">-->
-<!--    <div class="form-group">-->
-<!--      <label for="_from">Дата начала</label>-->
-<!--      <input class="form-control" id="_from" max="2019-10-14" type="date">-->
-<!--      <label for="_to">Дата окончания</label>-->
-<!--      <input class="form-control" id="_to" min="2019-10-14" type="date">-->
-<!--    </div>-->
-<!--  </div>-->
-<!--  <div class="modal-footer">-->
-<!--    <button class="btn btn-success" id="customDateSend" type="button">Применять</button>-->
-<!--    <button (click)="modalRef.hide()" class="btn btn-default" type="button">Закрыть</button>-->
-<!--  </div>-->
-<!--</ng-template>-->
-<!-- End-Modal -->
+<app-modal (apply)="apply($event)" #modalComponent></app-modal>

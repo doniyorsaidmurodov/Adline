@@ -8,6 +8,7 @@ import {PlatformsComponent} from './routes/platforms/platforms.component';
 import {AdsComponent} from './routes/ads/ads.component';
 import {GroupAdsChildComponent} from './routes/group-ads-child/group-ads-child.component';
 import {AdsChildComponent} from './routes/ads-child/ads-child.component';
+import {CsvDownloadComponent} from './routes/csv-download/csv-download.component';
 
 const routes: Routes = [
   {path: '', redirectTo: 'home', pathMatch: 'full'},
@@ -18,6 +19,7 @@ const routes: Routes = [
   {path: 'platforms', component: PlatformsComponent, canActivate: [GuardService]},
   {path: 'ads/:id', component: AdsChildComponent, canActivate: [GuardService]},
   {path: 'ads', component: AdsComponent, canActivate: [GuardService]},
+  {path: 'download', component: CsvDownloadComponent, canActivate: [GuardService]},
 ];
 
 @NgModule({

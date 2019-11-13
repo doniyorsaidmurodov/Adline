@@ -6,13 +6,18 @@ import {AuthComponent} from './auth.component';
 import {SharedModule} from '../shared/shared.module';
 import { ResetComponent } from './reset/reset.component';
 import { FinishComponent } from './finish/finish.component';
+import {ReactiveFormsModule} from '@angular/forms';
+import { ConfirmationInfoComponent } from './confirmation-info/confirmation-info.component';
+import {CabinetModule} from '../cabinet/cabinet.module';
 
 @NgModule({
-  declarations: [AuthComponent, ResetComponent, FinishComponent],
+  declarations: [AuthComponent, ResetComponent, FinishComponent, ConfirmationInfoComponent, ConfirmationInfoComponent],
   imports: [
     CommonModule,
     AuthRoutingModule,
-    SharedModule
+    SharedModule,
+    ReactiveFormsModule,
+    CabinetModule
   ]
 })
 export class AuthModule {

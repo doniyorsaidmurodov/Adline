@@ -74,32 +74,37 @@
             <div class="sec-left"></div>
             <div class="sec-right">
               <span class="period-text">Период:</span>
-              <span class="text-muted">от {{currentDates.second|date:'dd.MM.yyyy'}}
-                до {{currentDates.current|date:'dd.MM.yyyy'}}</span>
+              <span class="text-muted">от {{currentDates.second|date:'dd/MM/yyyy'}}
+                до {{currentDates.current|date:'dd/MM/yyyy'}}</span>
             </div>
           </div>
 
           <app-loader *ngIf="loading"></app-loader>
 
-          <table class="table table-bordered table-hover" *ngIf="!loading && adGroupList.length">
+          <div class="alert alert-danger" *ngIf="!loading && !adGroupList.length">
+            <h3>Ничего не найдено</h3>
+            <hr>
+            <h6>Нам очень жаль, но таблица пока пустая</h6>
+          </div>
 
+          <table class="table table-bordered table-hover" *ngIf="!loading && adGroupList.length">
             <thead>
             <tr>
               <th>ID группы</th>
               <th>Название группы</th>
               <th>Клики</th>
-              <th>Показы</th>
+              <th *ngIf="currentType !== 'GOOGLE_ADWORDS'">Показы</th>
               <th>CTR%</th>
               <th>Посмотреть</th>
             </tr>
             </thead>
 
             <tbody>
-            <tr *ngFor="let adGroup of adGroupListShowed">
+            <tr *ngFor="let adGroup of adGroupList">
               <td>{{adGroup.id}}</td>
               <td>{{adGroup.name}}</td>
               <td><a href="#" title="">{{adGroup.clicks}}</a></td>
-              <td><a href="#" title="">{{adGroup.impressions}}</a></td>
+              <td *ngIf="currentType !== 'GOOGLE_ADWORDS'"><a href="#" title="">{{adGroup.impressions}}</a></td>
               <td><a href="#" title="">{{adGroup.clickRate}}</a></td>
               <td><a href="#" class="btn hidden-sm-down btn-success"
                      [routerLink]="['/cabinet/ads', adGroup.id]">
@@ -107,22 +112,13 @@
               </a></td>
             </tr>
             </tbody>
-
-            <tfoot>
-            <tr>
-              <td colspan="7">
-                <pagination [hidden]="adGroupList.length <= 15" [itemsPerPage]="15" [totalItems]="adGroupList.length"
-                            (pageChanged)="pageChanged($event)"></pagination>
-              </td>
-            </tr>
-            </tfoot>
-
           </table>
-          <div class="alert alert-danger" *ngIf="!loading && !adGroupList.length">
-            <h3>Ничего не найдено</h3>
-            <hr>
-            <h6>Нам очень жаль, но таблица пока пустая</h6>
-          </div>
+          <pagination *ngIf="page"
+                      [hidden]="page.totalElements <= page.pageSize"
+                      [itemsPerPage]="page.pageSize"
+                      [totalItems]="page.totalElements"
+                      (pageChanged)="pageChanged($event)"
+          ></pagination>
         </div>
       </div>
     </div>

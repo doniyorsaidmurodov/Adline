@@ -10,12 +10,18 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-          <label for="datepicker">Выберите даты:</label>
-          <input [(ngModel)]="bsInlineRangeValue"
-                 bsDaterangepicker
+          <label for="datepicker1">Выберите первую дату:</label>
+          <input bsDatepicker
                  class="form-control"
-                 id="datepicker" placeholder="DD/MM/YYYY - DD/MM/YYYY"
-                 type="text">
+                 id="datepicker1" placeholder="DD/MM/YYYY"
+                 type="text" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }">
+        </div>
+        <div class="form-group">
+          <label for="datepicker2">Выберите вторую дату:</label>
+          <input bsDatepicker
+                 class="form-control"
+                 id="datepicker2" placeholder="DD/MM/YYYY"
+                 type="text" [bsConfig]="{ dateInputFormat: 'DD/MM/YYYY' }">
         </div>
       </div>
       <div class="modal-footer">

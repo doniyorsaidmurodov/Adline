@@ -5,6 +5,8 @@ import {ApiService} from '../../../services/api.service';
 import {ActivatedRoute} from '@angular/router';
 import {PageChangedEvent} from 'ngx-bootstrap';
 import {ModalComponent} from '../../components/modal/modal.component';
+import {dateBack, formatDate} from '../../../../environments/consts';
+import {Page} from '../../../models/Page';
 
 @Component({
   selector: 'app-ads-child',
@@ -15,11 +17,9 @@ export class AdsChildComponent implements OnInit, OnDestroy {
   bsInlineRangeValue: Date[] = [];
 
   adList: Ads[] = [];
-  adListShowed: Ads[] = [];
   loading = false;
   error: string = null;
   requestSub: Subscription;
-  // requestParams: string = null;
 
   id: number = null;
 
@@ -29,6 +29,7 @@ export class AdsChildComponent implements OnInit, OnDestroy {
   };
   currentPeriod = 4;
   currentType = 'GOOGLE_ADWORDS';
+  page: Page;
   currentDates: {
     current: Date;
     second: Date;
@@ -53,7 +54,7 @@ export class AdsChildComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getTable(type: string = 'GOOGLE_ADWORDS') {
+  private getTable(type: string = 'GOOGLE_ADWORDS', page: number = 0) {
     let secondDate = null;
     let currentDate = new Date();
 
@@ -94,24 +95,16 @@ export class AdsChildComponent implements OnInit, OnDestroy {
 
     this.loading = true;
     this.adList = [];
-    this.adListShowed = [];
 
-    // this.requestParams = JSON.stringify({
-    //   type,
-    //   startDate: secondDate.toISOString(),
-    //   endDate: currentDate.toISOString(),
-    //   adGroupId: this.id
-    // });
-    this.apiService.getAdList(type, secondDate.toISOString(), currentDate.toISOString(), this.id)
+    this.apiService.getAdList(type, formatDate(secondDate), formatDate(currentDate), this.id, page)
       .subscribe(next => {
         this.loading = false;
-        console.log(next);
+        this.page = new Page(next);
 
-        next.items.forEach(each => {
+        next.content.forEach(each => {
           const obj: Ads = new Ads(each);
           this.adList.push(obj);
         });
-        this.adListShowed = this.adList.slice(0, 15);
       }, error => console.error(error));
 
     // this.loading = true;
@@ -119,9 +112,7 @@ export class AdsChildComponent implements OnInit, OnDestroy {
   }
 
   pageChanged(event: PageChangedEvent): void {
-    const startItem = (event.page - 1) * event.itemsPerPage;
-    const endItem = event.page * event.itemsPerPage;
-    this.adListShowed = this.adList.slice(startItem, endItem);
+    this.getTable(this.currentType, event.page - 1);
   }
 
   setPeriod(number1: number) {
@@ -129,7 +120,7 @@ export class AdsChildComponent implements OnInit, OnDestroy {
       return;
     }
     this.currentPeriod = number1;
-    this.getTable();
+    this.getTable(this.currentType);
   }
 
   apply(event) {
@@ -149,7 +140,3 @@ export class AdsChildComponent implements OnInit, OnDestroy {
   // }
 }
 
-function dateBack(days: number) {
-  const date = new Date();
-  return new Date(date.getTime() - (days * 24 * 60 * 60 * 1000));
-}

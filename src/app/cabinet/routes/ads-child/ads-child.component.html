@@ -40,22 +40,22 @@
             <button type="button" class="btn btn-outline-primary"
                     [class.active]="currentPeriod === 4" (click)="setPeriod(4)">Год
             </button>
-<!--            <button class="btn btn-outline-primary" type="button" [class.active]="currentPeriod === 5"-->
-<!--                    (click)="openModal()">-->
-<!--              <i class="fa fa-calendar"></i>-->
-<!--            </button>-->
+            <!--            <button class="btn btn-outline-primary" type="button" [class.active]="currentPeriod === 5"-->
+            <!--                    (click)="openModal()">-->
+            <!--              <i class="fa fa-calendar"></i>-->
+            <!--            </button>-->
           </div>
-<!--          <button class="btn btn-success" (click)="download()">-->
-<!--            <i class="fa fa-upload mr-1"></i>Скачать данные-->
-<!--          </button>-->
+          <!--          <button class="btn btn-success" (click)="download()">-->
+          <!--            <i class="fa fa-upload mr-1"></i>Скачать данные-->
+          <!--          </button>-->
         </div>
       </div>
       <div class="main-nav border-0" style="height: 50px;">
         <div></div>
         <div>
           <span class="period-text">Период:</span>
-          <span class="text-muted">от {{currentDates.second|date:'dd.MM.yyyy'}}
-            до {{currentDates.current|date:'dd.MM.yyyy'}}</span>
+          <span class="text-muted">от {{currentDates.second|date:'dd/MM/yyyy'}}
+            до {{currentDates.current|date:'dd/MM/yyyy'}}</span>
         </div>
       </div>
       <section class="main-section p-4">
@@ -63,6 +63,13 @@
           <!-- Table -->
           <div class="col-12">
             <app-loader *ngIf="loading"></app-loader>
+
+            <div class="alert alert-danger" *ngIf="!loading && !adList.length">
+              <h3>Ничего не найдено</h3>
+              <hr>
+              <h6>Нам очень жаль, но таблица пока пустая</h6>
+            </div>
+
             <table class="table table-bordered table-hover toggle-circle" *ngIf="!loading && adList.length">
               <thead>
               <tr>
@@ -70,35 +77,27 @@
                 <th>Рекламные кампании</th>
                 <th>Группы объявлений</th>
                 <th>Клики</th>
-                <th>Показы</th>
+                <th *ngIf="currentType !== 'GOOGLE_ADWORDS'">Показы</th>
                 <th>CTR%</th>
               </tr>
               </thead>
               <tbody id="PTable">
-              <tr *ngFor="let list of adListShowed">
+              <tr *ngFor="let list of adList">
                 <td>{{list.id}}</td>
                 <td>{{list.groupName}}</td>
                 <td>{{list.campaignName}}</td>
                 <td>{{list.clicks}}</td>
-                <td>{{list.impressions}}</td>
+                <td *ngIf="currentType !== 'GOOGLE_ADWORDS'">{{list.impressions}}</td>
                 <td>{{list.clickRate}}%</td>
               </tr>
               </tbody>
-              <tfoot>
-              <tr>
-                <td colspan="7">
-                  <pagination [hidden]="adList.length <= 15" [itemsPerPage]="15"
-                              [totalItems]="adList.length"
-                              (pageChanged)="pageChanged($event)"></pagination>
-                </td>
-              </tr>
-              </tfoot>
+              <pagination *ngIf="page"
+                          [hidden]="page.totalElements <= page.pageSize"
+                          [itemsPerPage]="page.pageSize"
+                          [totalItems]="page.totalElements"
+                          (pageChanged)="pageChanged($event)"
+              ></pagination>
             </table>
-            <div class="alert alert-danger" *ngIf="!loading && !adList.length">
-              <h3>Ничего не найдено</h3>
-              <hr>
-              <h6>Нам очень жаль, но таблица пока пустая</h6>
-            </div>
           </div>
         </div>
       </section>

@@ -95,57 +95,60 @@
               <div class="sec-left"></div>
               <div class="sec-right">
                 <span class="period-text">Период:</span>
-                <span id="period" class="text-muted">от {{currentDates.second|date:'dd.MM.yyyy'}}
-                  до {{currentDates.current|date:'dd.MM.yyyy'}}</span>
+                <span id="period" class="text-muted">от {{currentDates.second|date:'dd/MM/yyyy'}}
+                  до {{currentDates.current|date:'dd/MM/yyyy'}}</span>
               </div>
             </div>
 
             <app-loader *ngIf="loading"></app-loader>
 
-            <table class="table table-bordered table-hover" *ngIf="!loading && campaignListShowed.length">
-              <thead>
-              <tr>
-                <th>ID Кампании</th>
-                <th>Название</th>
-                <th>Статус</th>
-                <th>Клики</th>
-                <th>Показы</th>
-                <th>CTR%</th>
-                <th>Посмотреть</th>
-              </tr>
-              </thead>
-
-              <tbody>
-              <tr *ngFor="let adCampaign of campaignListShowed">
-                <td>{{adCampaign.id}}</td>
-                <td>{{adCampaign.name}}</td>
-                <td *ngIf="adCampaign.status"><span class="status green"></span>Запущено</td>
-                <td *ngIf="!adCampaign.status"><span class="status red"></span>Приостановлена</td>
-                <td><a href="#" title="">{{adCampaign.clicks}}</a></td>
-                <td><a href="#" title="">{{adCampaign.impressions}}</a></td>
-                <td>{{adCampaign.clickRate}}%</td>
-                <td>
-                  <a class="btn hidden-sm-down btn-success" href="javascript:void(0);"
-                     (click)="more(adCampaign.id)">См. Группу</a>
-                </td>
-              </tr>
-              </tbody>
-
-              <tfoot>
-              <tr>
-                <td colspan="7">
-                  <pagination [hidden]="campaignList.length <= 15" [itemsPerPage]="15"
-                              [totalItems]="campaignList.length"
-                              (pageChanged)="pageChanged($event)"></pagination>
-                </td>
-              </tr>
-              </tfoot>
-
-            </table>
-            <div class="alert alert-danger" *ngIf="!loading && !campaignListShowed.length">
+            <div class="alert alert-danger" *ngIf="!loading && !campaignList.length">
               <h3>Ничего не найдено</h3>
               <hr>
               <h6>Нам очень жаль, но таблица пока пустая</h6>
+            </div>
+
+            <div [class.table-responsive]="currentType === 'YOUTUBE'">
+              <table class="table table-bordered table-hover" *ngIf="!loading && campaignList.length">
+                <thead>
+                <tr>
+                  <th>ID Кампании</th>
+                  <th>Название</th>
+                  <th>Статус</th>
+                  <th>Клики</th>
+                  <th>Показы</th>
+                  <th>CTR%</th>
+                  <th *ngIf="currentType === 'YOUTUBE'">Просмотры</th>
+                  <th *ngIf="currentType === 'YOUTUBE'">VTR%</th>
+                  <th>Посмотреть</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr *ngFor="let adCampaign of campaignList">
+                  <td>{{adCampaign.id}}</td>
+                  <td>{{adCampaign.name}}</td>
+                  <td *ngIf="adCampaign.status==='ENABLED'"><span class="status green"></span>Запущено</td>
+                  <td *ngIf="adCampaign.status==='PAUSED'"><span class="status red"></span>Приостановлена</td>
+                  <td *ngIf="adCampaign.status==='ARCHIVED'"><span class="status red"></span>В архиве</td>
+                  <td><a href="#" title="">{{adCampaign.clicks}}</a></td>
+                  <td><a href="#" title="">{{adCampaign.impressions}}</a></td>
+                  <td>{{adCampaign.clickRate}}%</td>
+                  <td *ngIf="currentType === 'YOUTUBE'">{{adCampaign.views}}</td>
+                  <td *ngIf="currentType === 'YOUTUBE'">{{adCampaign.viewRate}}</td>
+                  <td>
+                    <a class="btn hidden-sm-down btn-success btn-sm" href="javascript:void(0);"
+                       (click)="more(adCampaign.id)">См. Группу</a>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+              <pagination *ngIf="page"
+                          [hidden]="page.totalElements <= page.pageSize"
+                          [itemsPerPage]="page.pageSize"
+                          [totalItems]="page.totalElements"
+                          (pageChanged)="pageChanged($event)"
+              ></pagination>
             </div>
           </div>
         </div>

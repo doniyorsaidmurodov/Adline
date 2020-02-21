@@ -2,8 +2,8 @@ import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Subscription} from 'rxjs';
 import {ApiService} from '../../../services/api.service';
 import {Ads} from '../../../models/Ads';
-import {PageChangedEvent} from 'ngx-bootstrap';
 import {ModalComponent} from '../../components/modal/modal.component';
+import {formatDate} from '../../../../environments/consts';
 
 @Component({
   selector: 'app-ads',
@@ -14,7 +14,6 @@ export class AdsComponent implements OnInit, OnDestroy {
   bsInlineRangeValue: Date[] = [];
 
   adList: Ads[] = [];
-  adListShowed: Ads[] = [];
   loading = false;
   error: string = null;
   requestSub: Subscription;
@@ -56,7 +55,6 @@ export class AdsComponent implements OnInit, OnDestroy {
 
     this.loading = true;
     this.adList = [];
-    this.adListShowed = [];
 
     switch (this.currentPeriod) {
       case 1:
@@ -94,26 +92,18 @@ export class AdsComponent implements OnInit, OnDestroy {
       impressions: 0
     };
 
-    this.requestParams = JSON.stringify({type, startDate: secondDate.toISOString(), endDate: currentDate.toISOString()});
+    this.requestParams = JSON.stringify({type, fromDate: formatDate(secondDate), toDate: formatDate(currentDate)});
     sessionStorage.setItem('requestParams', this.requestParams);
-    this.apiService.getAdList(type, secondDate.toISOString(), currentDate.toISOString())
+    this.apiService.getAdList(type, String(secondDate), String(currentDate))
       .subscribe(next => {
         this.loading = false;
-        console.log(next);
 
-        next.items.forEach(each => {
+        next.content.forEach(each => {
           const obj: Ads = new Ads(each);
           this.adList.push(obj);
         });
-        this.adListShowed = this.adList.slice(0, 15);
       }, error => console.error(error));
 
-  }
-
-  pageChanged(event: PageChangedEvent): void {
-    const startItem = (event.page - 1) * event.itemsPerPage;
-    const endItem = event.page * event.itemsPerPage;
-    this.adListShowed = this.adList.slice(startItem, endItem);
   }
 
   apply(event) {

@@ -5,6 +5,8 @@ import {Campaign} from '../../../models/Campaign';
 import {PageChangedEvent} from 'ngx-bootstrap';
 import {ModalComponent} from '../../components/modal/modal.component';
 import {Router} from '@angular/router';
+import {formatDate} from '../../../../environments/consts';
+import {Page} from '../../../models/Page';
 
 @Component({
   selector: 'app-group-ads',
@@ -15,7 +17,6 @@ export class GroupAdsComponent implements OnInit, OnDestroy {
   bsInlineRangeValue: Date[] = [];
 
   adGroupList: Campaign[] = [];
-  adGroupListShowed: Campaign[] = [];
   loading = false;
   error: string = null;
   requestSub: Subscription;
@@ -27,6 +28,7 @@ export class GroupAdsComponent implements OnInit, OnDestroy {
   };
   currentPeriod = 4;
   currentType = 'GOOGLE_ADWORDS';
+  page: Page;
   currentDates: {
     current: Date;
     second: Date;
@@ -37,7 +39,7 @@ export class GroupAdsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     sessionStorage.setItem('currentType', 'GOOGLE_ADWORDS');
-    this.getTable();
+    this.getTable(this.currentType, 0);
   }
 
   ngOnDestroy(): void {
@@ -52,7 +54,7 @@ export class GroupAdsComponent implements OnInit, OnDestroy {
     }
     this.currentType = status;
     sessionStorage.setItem('currentType', status);
-    this.getTable(this.currentType);
+    this.getTable(this.currentType, 0);
   }
 
   setPeriod(number1: number) {
@@ -60,26 +62,41 @@ export class GroupAdsComponent implements OnInit, OnDestroy {
       return;
     }
     this.currentPeriod = number1;
-    this.getTable(this.currentType);
+    this.getTable(this.currentType, 0);
   }
 
   pageChanged(event: PageChangedEvent): void {
-    const startItem = (event.page - 1) * event.itemsPerPage;
-    const endItem = event.page * event.itemsPerPage;
-    this.adGroupListShowed = this.adGroupList.slice(startItem, endItem);
+    // console.log('page -->  ' + event.page);
+    this.getTable(this.currentType, event.page - 1);
   }
 
   apply(event) {
     this.bsInlineRangeValue = event;
     this.currentPeriod = 5;
-    this.getTable(this.currentType);
+    this.getTable(this.currentType, 0);
   }
 
   openModal() {
     this.modalComponent.openModal();
   }
 
-  private getTable(type: string = 'GOOGLE_ADWORDS') {
+  download() {
+    sessionStorage.setItem('download', this.requestParams);
+    sessionStorage.setItem('downloadRoute', 'ad-groups');
+    window.open(window.origin + '/cabinet/download', '_blank');
+  }
+
+  more(id: string) {
+    sessionStorage.setItem('request', JSON.stringify({
+      request: this.requestParams,
+      currentType: this.currentType,
+      currentPeriod: this.currentPeriod
+    }));
+    this.router.navigate(['/cabinet/ads', id]).then();
+  }
+
+  private getTable(type: string = 'GOOGLE_ADWORDS', page: number) {
+    // console.log('get table page --> ' + page);
     let secondDate = null;
     let currentDate = new Date();
 
@@ -120,48 +137,38 @@ export class GroupAdsComponent implements OnInit, OnDestroy {
     };
     this.loading = true;
     this.adGroupList = [];
-    this.adGroupListShowed = [];
 
     if (this.requestSub) {
       this.requestSub.unsubscribe();
     }
 
-    this.requestParams = JSON.stringify({type, startDate: secondDate.toISOString(), endDate: currentDate.toISOString()});
+    this.requestParams = JSON.stringify({
+      type,
+      fromDate: formatDate(secondDate),
+      toDate: formatDate(currentDate),
+      page
+    });
     sessionStorage.setItem('requestParams', this.requestParams);
-    this.requestSub = this.apiService.getAdGroupList(type, secondDate.toISOString(), currentDate.toISOString())
+    this.requestSub = this.apiService.getAdGroupList(type, formatDate(secondDate), formatDate(currentDate), null, page)
       .subscribe(next => {
-        console.log(next);
-
+        this.page = new Page(next);
+        // console.log(next);
+        // console.log(this.page);
         this.loading = false;
-        next.items.forEach(each => {
+
+        next.content.forEach(each => {
           this.total.clicks += each.clicks;
           this.total.impressions += each.impressions;
 
           const obj: Campaign = new Campaign(each);
           this.adGroupList.push(obj);
         });
-        this.adGroupListShowed = this.adGroupList.slice(0, 15);
       }, error => {
         this.loading = false;
 
         this.error = error.error.message;
         console.error(error);
       });
-  }
-
-  download() {
-    sessionStorage.setItem('download', this.requestParams);
-    sessionStorage.setItem('downloadRoute', 'ad-groups');
-    window.open(window.origin + '/cabinet/download', '_blank');
-  }
-
-  more(id: string) {
-    sessionStorage.setItem('request', JSON.stringify({
-      request: this.requestParams,
-      currentType: this.currentType,
-      currentPeriod: this.currentPeriod
-    }));
-    this.router.navigate(['/cabinet/ads', id]).then();
   }
 }
 

@@ -11,7 +11,7 @@ import {PaginationModule} from 'ngx-bootstrap/pagination';
 import {ModalModule} from 'ngx-bootstrap/modal';
 import {BsDatepickerModule} from 'ngx-bootstrap/datepicker';
 
-import {MainComponent} from './routes/main/main.component';
+import {HomeComponent} from './routes/home/home.component';
 import {PlatformsComponent} from './routes/platforms/platforms.component';
 import {CampaignsComponent} from './routes/campaigns/campaigns.component';
 import {GroupAdsComponent} from './routes/group-ads/group-ads.component';
@@ -21,7 +21,7 @@ import {AdsComponent} from './routes/ads/ads.component';
 import {GroupAdsChildComponent} from './routes/group-ads-child/group-ads-child.component';
 import {AdsChildComponent} from './routes/ads-child/ads-child.component';
 import { ModalComponent } from './components/modal/modal.component';
-import { CsvDownloadComponent } from './routes/csv-download/csv-download.component';
+import { DownloadComponent } from './routes/download/download.component';
 
 
 @NgModule({
@@ -29,7 +29,7 @@ import { CsvDownloadComponent } from './routes/csv-download/csv-download.compone
     NavbarComponent,
     FooterComponent,
     LoaderComponent,
-    MainComponent,
+    HomeComponent,
     PlatformsComponent,
     CampaignsComponent,
     GroupAdsComponent,
@@ -37,7 +37,7 @@ import { CsvDownloadComponent } from './routes/csv-download/csv-download.compone
     AdsComponent,
     AdsChildComponent,
     ModalComponent,
-    CsvDownloadComponent
+    DownloadComponent
   ],
   exports: [
     NavbarComponent

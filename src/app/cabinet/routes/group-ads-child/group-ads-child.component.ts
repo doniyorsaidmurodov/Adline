@@ -5,6 +5,8 @@ import {ApiService} from '../../../services/api.service';
 import {ActivatedRoute} from '@angular/router';
 import {PageChangedEvent} from 'ngx-bootstrap';
 import {ModalComponent} from '../../components/modal/modal.component';
+import {formatDate} from '../../../../environments/consts';
+import {Page} from '../../../models/Page';
 
 @Component({
   selector: 'app-group-ads-child',
@@ -15,7 +17,6 @@ export class GroupAdsChildComponent implements OnInit, OnDestroy {
   bsInlineRangeValue: Date[] = [];
 
   adGroupList: Campaign[] = [];
-  adGroupListShowed: Campaign[] = [];
   loading = false;
   error: string = null;
   requestSub: Subscription;
@@ -29,6 +30,7 @@ export class GroupAdsChildComponent implements OnInit, OnDestroy {
   };
   currentPeriod = 4;
   currentType = 'GOOGLE_ADWORDS';
+  page: Page;
   currentDates: {
     current: Date;
     second: Date;
@@ -44,7 +46,7 @@ export class GroupAdsChildComponent implements OnInit, OnDestroy {
     this.currentPeriod = request.currentPeriod || 4;
     this.bsInlineRangeValue[0] = JSON.parse(request.request).startDate;
     this.bsInlineRangeValue[1] = JSON.parse(request.request).endDate;
-    this.getTable();
+    this.getTable(this.currentType);
   }
 
   ngOnDestroy(): void {
@@ -53,20 +55,15 @@ export class GroupAdsChildComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getTable(type: string = 'GOOGLE_ADWORDS') {
+  private getTable(type: string = 'GOOGLE_ADWORDS', page: number = 0) {
     let secondDate = null;
     let currentDate = new Date();
 
     switch (this.currentPeriod) {
       case 1:
-        // const date = new Date();
-        // const day = date.getDay();
-        // const diff = date.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
-        // secondDate = new Date(date.setDate(diff));
         secondDate = dateBack(7);
         break;
       case 2:
-        // secondDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
         secondDate = dateBack(30);
         break;
       case 3:
@@ -94,24 +91,26 @@ export class GroupAdsChildComponent implements OnInit, OnDestroy {
     };
     this.loading = true;
     this.adGroupList = [];
-    this.adGroupListShowed = [];
 
     if (this.requestSub) {
       this.requestSub.unsubscribe();
     }
 
-    this.requestParams = JSON.stringify({type, startDate: secondDate, endDate: currentDate, campaignId: this.id});
-    this.requestSub = this.apiService.getAdGroupList(type, secondDate.toISOString(), currentDate.toISOString(), this.id)
+    this.requestParams = JSON.stringify({type, fromDate: secondDate, toDate: currentDate, campaignId: this.id, page});
+    this.requestSub = this.apiService.getAdGroupList(type, formatDate(secondDate), formatDate(currentDate), this.id, page)
       .subscribe(next => {
+        this.page = new Page(next);
+        // console.log(next);
+        // console.log(this.page);
+
         this.loading = false;
-        next.items.forEach(each => {
+        next.content.forEach(each => {
           this.total.clicks += each.clicks;
           this.total.impressions += each.impressions;
 
           const obj: Campaign = new Campaign(each);
           this.adGroupList.push(obj);
         });
-        this.adGroupListShowed = this.adGroupList.slice(0, 15);
       }, error => {
         this.loading = false;
 
@@ -129,9 +128,7 @@ export class GroupAdsChildComponent implements OnInit, OnDestroy {
   }
 
   pageChanged(event: PageChangedEvent): void {
-    const startItem = (event.page - 1) * event.itemsPerPage;
-    const endItem = event.page * event.itemsPerPage;
-    this.adGroupListShowed = this.adGroupList.slice(startItem, endItem);
+    this.getTable(this.currentType, event.page - 1);
   }
 
 

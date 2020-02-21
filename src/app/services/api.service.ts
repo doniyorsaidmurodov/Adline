@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {host} from '../../environments/consts';
+import {formatDate, host} from '../../environments/consts';
 import {AuthService} from './auth.service';
 
 @Injectable({
@@ -45,36 +45,36 @@ export class ApiService {
   }
 
   // platform
-  getAdGroupList(type: string, startDate: string, endDate: string, campaignId: number = null) {
+  getAdGroupList(type: string, fromDate: string, toDate: string, campaignId: number = null, page: number, size: number = 10) {
     const token = this.authService.getToken();
     let body = null;
     if (campaignId) {
-      body = {type, startDate, endDate, campaignId};
+      body = {type, fromDate, toDate, campaignId, page, size};
     } else {
-      body = {type, startDate, endDate};
+      body = {type, fromDate, toDate, page, size};
     }
-    return this.http.post<any>(host + 'ad-groups', body, {
+    return this.http.get<any>(host + 'ad-groups', {
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token
-      }
+      }, params: body
     });
   }
 
-  getAdList(type: string, startDate: string, endDate: string, adGroupId: number = null) {
+  getAdList(type: string, fromDate: string, toDate: string, adGroupId: number = null, page: number = 0, size: number = 10) {
     const token = this.authService.getToken();
     let body = null;
     if (adGroupId) {
-      body = {type, startDate, endDate, adGroupId};
+      body = {type, fromDate, toDate, adGroupId, page, size};
     } else {
-      body = {type, startDate, endDate};
+      body = {type, fromDate, toDate, page, size};
     }
-    return this.http.post<any>(host + 'ads', body, {
+    return this.http.get<any>(host + 'ads', {
       headers: {
         'Content-Type': 'application/json',
-        Accept: 'application/octet-stream',
+        Accept: 'application/json',
         Authorization: 'Bearer ' + token,
-      }
+      }, params: body
     });
   }
 
@@ -89,13 +89,13 @@ export class ApiService {
     });
   }
 
-  getCampaignList(type: string, startDate: string, endDate: string) {
+  getCampaignList(type: string, fromDate: string, toDate: string, page: number = 0, size: number = 10) {
     const token = this.authService.getToken();
-    return this.http.post<any>(host + 'campaigns', {type, startDate, endDate}, {
+    return this.http.get<any>(host + 'campaigns', {
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token
-      }
+      }, params: JSON.parse(JSON.stringify({type, fromDate, toDate, page, size}))
     });
   }
 
@@ -112,28 +112,12 @@ export class ApiService {
 
   getDownload(route: string, requests: string) {
     const token = this.authService.getToken();
-    return this.http.post<any>(host + route + '/download', JSON.parse(requests), {
+    return this.http.get<any>(host + route + '/download', {
       responseType: 'blob' as 'json',
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token,
-      }
+      }, params: JSON.parse(requests)
     });
   }
-}
-
-function formatDate(date) {
-  const d = new Date(date);
-  let month = '' + (d.getMonth() + 1);
-  let day = '' + d.getDate();
-  const year = d.getFullYear();
-
-  if (month.length < 2) {
-    month = '0' + month;
-  }
-  if (day.length < 2) {
-    day = '0' + day;
-  }
-
-  return [year, month, day].join('-');
 }

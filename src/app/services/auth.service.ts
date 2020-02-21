@@ -15,7 +15,8 @@ export class AuthService {
 
   setToken(token: string, rememberMe: boolean = false): void {
     if (rememberMe === true) {
-      this.cookieService.set('token', token, new Date(new Date().getTime() + 30 * 60000));
+      this.cookieService.set('token', token, new Date(new Date().getTime() + 7 * 24 * 60 * 60000));
+      // this.cookieService.set('token', token);
     }
     sessionStorage.setItem('token', token);
   }

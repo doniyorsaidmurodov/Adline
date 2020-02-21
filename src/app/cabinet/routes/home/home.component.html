@@ -1,17 +1,20 @@
 <app-navbar></app-navbar>
 
-<!----------Platforms---------->
+<!--------Main-------->
 <div class="wrapper">
   <div class="container-fluid">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a routerLink="/cabinet/home">Главная страница</a></li>
-        <li aria-current="page" class="breadcrumb-item active">Платформы</li>
-      </ol>
-    </nav>
     <div class="main">
+      <div class="main-header">
+        <h1>Main</h1>
+      </div>
       <div class="main-nav">
-        <div></div>
+        <div class="sec-left">
+          <ng-container *ngFor="let each of filtered">
+            <input type="checkbox" name="playform{{each.name}}" id="playform{{each.name}}"
+                   [(ngModel)]="each.value" (click)="filter(each.name)">
+            <label for="playform{{each.name}}"> {{each.name}}</label>
+          </ng-container>
+        </div>
         <div>
           <div class="btn-group mr-3" role="group">
             <button type="button" class="btn btn-outline-primary"
@@ -31,9 +34,9 @@
               <i class="fa fa-calendar"></i>
             </button>
           </div>
-<!--          <button class="btn btn-success" (click)="download()">-->
-<!--            <i class="fa fa-upload mr-1"></i>Скачать данные-->
-<!--          </button>-->
+          <!--          <button class="btn btn-success" (click)="download()">-->
+          <!--            <i class="fa fa-upload mr-1"></i>Скачать данные-->
+          <!--          </button>-->
         </div>
       </div>
       <div class="main-nav border-0" style="height: 50px;">
@@ -44,40 +47,44 @@
             до {{currentDates.current|date:'dd/MM/yyyy'}}</span>
         </div>
       </div>
-      <section class="main-section p-4">
-        <div class="row">
+      <section class="main-section p-3">
+        <app-loader *ngIf="loading"></app-loader>
+        <div class="row" *ngIf="!loading && chartData.length">
           <!-- Table -->
-          <div class="col-md-12">
-            <app-loader *ngIf="loading"></app-loader>
-            <table class="table table-bordered table-hover toggle-circle" *ngIf="!loading && adList.length">
+          <div class="col-12">
+            <table class="table table-bordered table-hover toggle-circle">
               <thead>
               <tr>
                 <th>Платформы</th>
-                <th>Рекламные кампании</th>
-                <th>Группы объявлений</th>
-                <th>Объявления</th>
+                <th>Клики</th>
+                <th>Показы</th>
+                <th>CTR%</th>
+                <th>Просмотры</th>
+                <th>VTR%</th>
               </tr>
               </thead>
               <tbody id="PTable">
-              <tr *ngFor="let list of adList">
-                <td>{{list.name}}</td>
-                <td>{{list.campaigns}}</td>
-                <td>{{list.adGroups}}</td>
-                <td>{{list.ads}}</td>
+              <tr *ngFor="let data of chartData">
+                <td style="text-align: left">{{data.name}}</td>
+                <td>{{data.clicks}}</td>
+                <td>{{data.impressions}}</td>
+                <td>{{data.clickRate}}%</td>
+                <td>{{data.views}}</td>
+                <td>{{data.viewRate}}%</td>
               </tr>
               </tbody>
             </table>
-            <div class="alert alert-danger" *ngIf="!loading && !adList.length">
-              <h3>Ничего не найдено</h3>
-              <hr>
-              <h6>Нам очень жаль, но таблица пока пустая</h6>
-            </div>
+          </div>
+          <!-- Chart -->
+          <div class="col-12">
+            <div echarts [options]="chartOption" class="demo-chart"></div>
           </div>
         </div>
       </section>
     </div>
   </div>
 </div>
+<!--------End-Main-------->
 
 <app-footer></app-footer>
 

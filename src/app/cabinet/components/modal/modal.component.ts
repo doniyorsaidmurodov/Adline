@@ -1,6 +1,5 @@
 import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {ModalDirective} from 'ngx-bootstrap';
-import {log} from 'util';
 
 @Component({
   selector: 'app-modal',
@@ -9,7 +8,6 @@ import {log} from 'util';
 })
 export class ModalComponent implements OnInit {
   @ViewChild('childModal', {static: false}) childModal: ModalDirective;
-  bsInlineRangeValue;
   @Output() apply = new EventEmitter();
 
   constructor() {
@@ -17,7 +15,8 @@ export class ModalComponent implements OnInit {
 
   openModal() {
     this.childModal.show();
-    (document.getElementById('datepicker') as HTMLInputElement).value = sessionStorage.getItem('filter');
+    (document.getElementById('datepicker1') as HTMLInputElement).value = sessionStorage.getItem('filter1');
+    (document.getElementById('datepicker2') as HTMLInputElement).value = sessionStorage.getItem('filter2');
   }
 
   closeModal() {
@@ -29,8 +28,12 @@ export class ModalComponent implements OnInit {
 
   applied() {
     this.closeModal();
-    this.apply.emit(this.bsInlineRangeValue);
-    const date = (document.getElementById('datepicker') as HTMLInputElement).value;
-    sessionStorage.setItem('filter', date);
+    const tmpDate1 = ((document.getElementById('datepicker1') as HTMLInputElement).value).split('/');
+    const tmpDate2 = ((document.getElementById('datepicker1') as HTMLInputElement).value).split('/');
+    const date1 = tmpDate1[2] + '/' + tmpDate1[1] + '/' + tmpDate1[0];
+    const date2 = tmpDate2[2] + '/' + tmpDate2[1] + '/' + tmpDate2[0];
+    this.apply.emit([date1, date2]);
+    sessionStorage.setItem('filter1', date1);
+    sessionStorage.setItem('filter2', date2);
   }
 }

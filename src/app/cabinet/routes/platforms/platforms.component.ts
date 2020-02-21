@@ -3,6 +3,7 @@ import {Subscription} from 'rxjs';
 import {ApiService} from '../../../services/api.service';
 import {Platform} from '../../../models/Platform';
 import {ModalComponent} from '../../components/modal/modal.component';
+import {formatDate} from '../../../../environments/consts';
 
 @Component({
   selector: 'app-platforms',
@@ -83,8 +84,7 @@ export class PlatformsComponent implements OnInit, OnDestroy {
       impressions: 0
     };
 
-    // this.requestParams = JSON.stringify({fromDate: secondDate.toISOString(), toDate: currentDate.toISOString()});
-    this.apiService.getPlatformList(secondDate.toISOString(), currentDate.toISOString())
+    this.apiService.getPlatformList(formatDate(secondDate), formatDate(currentDate))
       .subscribe(next => {
         this.loading = false;
 

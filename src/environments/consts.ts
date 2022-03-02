@@ -1,1 +1,1 @@
-export const host = 'http://api.adline.ga/api/';
+export const host = 'https://api.adline.ga/api/';
